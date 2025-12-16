@@ -1,0 +1,26 @@
+{% for teacher in teachers %}
+<a href="{% url 'teacher_detail' teacher.id %}" class="teacher-card">
+    {% if teacher.profile_image %}
+    <img src="{{ teacher.profile_image.url }}" alt="{{ teacher.first_name }}" class="teacher-avatar">
+    {% else %}
+    <img src="https://ui-avatars.com/api/?name={{ teacher.first_name }}+{{ teacher.last_name }}&background=4f46e5&color=fff"
+        alt="{{ teacher.first_name }}" class="teacher-avatar">
+    {% endif %}
+
+    <div class="teacher-name">{{ teacher.first_name }} {{ teacher.last_name }}</div>
+    <div class="teacher-email">{{ teacher.email }}</div>
+
+    <div class="teacher-subjects">
+        {% for subject in teacher.subjects.all|slice:":3" %}
+        <span class="subject-tag">{{ subject.name }}</span>
+        {% endfor %}
+        {% if teacher.subjects.count > 3 %}
+        <span class="subject-tag">+{{ teacher.subjects.count|add:"-3" }}</span>
+        {% endif %}
+    </div>
+</a>
+{% empty %}
+<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
+    No teachers found matching your criteria.
+</div>
+{% endfor %}

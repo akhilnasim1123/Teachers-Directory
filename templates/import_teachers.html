@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Import Teachers | TeacherDirectory{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Import Teachers</h1>
+    <a href="{% url 'teachers' %}" class="btn btn-secondary">Back to Directory</a>
+</div>
+
+<div class="card" style="max-width: {% if preview_data %}1000px{% else %}600px{% endif %}; margin: 0 auto;">
+
+    {% if not preview_data %}
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <div
+            style="background: #eef2ff; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--primary-color);">
+            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3 3m0 0l-3-3m3 3v-8"></path>
+            </svg>
+        </div>
+        <h2 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Upload CSV File</h2>
+        <p style="color: var(--text-secondary);">Bulk import teachers to the directory.</p>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert-success">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" style="text-align: center;">
+        {% csrf_token %}
+        <div class="form-group"
+            style="margin-bottom: 2rem; border: 2px dashed var(--border-color); padding: 2rem; border-radius: 1rem;">
+            <input type="file" name="file" required class="form-control" style="border: none;">
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%; justify-content: center;">
+            Preview Import
+        </button>
+    </form>
+
+    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+        <h4 style="margin-bottom: 0.5rem;">CSV Format Requirements</h4>
+        <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">
+            The file must contain columns in the following <strong>exact order</strong>:
+        </p>
+        <ol style="text-align: left; color: var(--text-secondary); font-size: 0.875rem; padding-left: 1.5rem;">
+            <li>First Name</li>
+            <li>Last Name</li>
+            <li>Profile Picture Filename</li>
+            <li>Email Address</li>
+            <li>Phone Number</li>
+            <li>Room Number</li>
+            <li>Subjects Taught (separate with pipe | or comma ,)</li>
+        </ol>
+    </div>
+
+    {% else %}
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Preview Data</h2>
+        <p style="color: var(--text-secondary);">Please review the data below before confirming the import.</p>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 2rem;">
+            <thead>
+                <tr style="text-align: left; background-color: #f9fafb; border-bottom: 2px solid var(--border-color);">
+                    <th style="padding: 0.75rem;">Name</th>
+                    <th style="padding: 0.75rem;">Email</th>
+                    <th style="padding: 0.75rem;">Phone</th>
+                    <th style="padding: 0.75rem;">Room</th>
+                    <th style="padding: 0.75rem;">Subjects</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in preview_data %}
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 0.75rem;">{{ row.first_name }} {{ row.last_name }}</td>
+                    <td style="padding: 0.75rem;">{{ row.email }}</td>
+                    <td style="padding: 0.75rem;">{{ row.phone }}</td>
+                    <td style="padding: 0.75rem;">{{ row.room }}</td>
+                    <td style="padding: 0.75rem;">
+                        {% for sub in row.subjects %}
+                        <span
+                            style="background: #e0e7ff; color: var(--primary-color); padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.75rem; margin-right: 0.25rem; display: inline-block; margin-bottom: 0.25rem;">
+                            {{sub }}</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="cancel" value="1" class="btn btn-secondary">Cancel</button>
+        </form>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="confirm" value="1" class="btn">Confirm Import</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

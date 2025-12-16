@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ teacher.first_name }} {{ teacher.last_name }} | TeacherDirectory{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1.5rem;">
+    <a href="{% url 'teachers' %}" class="btn btn-secondary">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+            </path>
+        </svg>
+        Back to Directory
+    </a>
+</div>
+
+<div class="profile-card">
+    <div class="profile-header">
+        <div class="profile-actions">
+            <!-- Trigger Edit Modal -->
+            <button onclick="openModal('editModal')" class="btn-edit-profile">Edit Profile</button>
+            <!-- Trigger Delete Modal -->
+            <button onclick="openModal('deleteModal')" class="btn-edit-profile"
+                style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fee2e2;">Delete</button>
+        </div>
+
+        {% if teacher.profile_image %}
+        <img src="{{ teacher.profile_image.url }}" alt="{{ teacher.first_name }}" class="profile-avatar">
+        {% else %}
+        <img src="https://ui-avatars.com/api/?name={{ teacher.first_name }}+{{ teacher.last_name }}&background=fff&color=4f46e5"
+            alt="{{ teacher.first_name }}" class="profile-avatar">
+        {% endif %}
+
+        <div class="profile-info">
+            <h1>{{ teacher.first_name }} {{ teacher.last_name }}</h1>
+        </div>
+    </div>
+
+    <div class="profile-body">
+        <div class="profile-details">
+            <div class="info-group">
+                <div class="info-label">Email Address</div>
+                <div class="info-value">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                    {{ teacher.email }}
+                </div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">Phone Number</div>
+                <div class="info-value">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                        </path>
+                    </svg>
+                    {{ teacher.phone }}
+                </div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-label">Room Number</div>
+                <div class="info-value">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                        </path>
+                    </svg>
+                    {{ teacher.room_number }}
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-subjects">
+            <div class="info-group">
+                <div class="info-label">Subjects Taught</div>
+                <div class="subject-cloud">
+                    {% for subject in teacher.subjects.all %}
+                    <span class="subject-pill">{{ subject.name }}</span>
+                    {% empty %}
+                    <span style="color: var(--text-secondary);">No subjects assigned.</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit Teacher</h3>
+            <button onclick="closeModal('editModal')" class="modal-close">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'teacher_update' teacher.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" name="first_name" class="form-control" value="{{ teacher.first_name }}" required>
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" name="last_name" class="form-control" value="{{ teacher.last_name }}" required>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" class="form-control" value="{{ teacher.email }}" required>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" name="phone" class="form-control" value="{{ teacher.phone }}" required>
+            </div>
+            <div class="form-group">
+                <label>Room Number</label>
+                <input type="text" name="room_number" class="form-control" value="{{ teacher.room_number }}" required>
+            </div>
+            <div class="form-group">
+                <label>Profile Image</label>
+                <input type="file" name="profile_image" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Subjects</label>
+                <select name="subjects" class="form-control" multiple style="height: 120px;">
+                    {% for subject in all_subjects %}
+                    <option value="{{ subject.id }}" {% if subject in teacher.subjects.all %}selected{% endif %}>
+                        {{ subject.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">Hold Ctrl/Cmd to
+                    select multiple</small>
+            </div>
+            <div class="form-group">
+                <label>Add New Subjects (comma separated)</label>
+                <input type="text" name="new_subjects" class="form-control" placeholder="e.g. Physics, Chemistry">
+            </div>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                <button type="button" onclick="closeModal('editModal')" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal-overlay modal-delete">
+    <div class="modal-container">
+        <div
+            style="background: #fee2e2; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #ef4444;">
+            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                </path>
+            </svg>
+        </div>
+        <h3 class="modal-title" style="margin-bottom: 1rem;">Delete Teacher?</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+            Are you sure you want to delete <strong>{{ teacher.first_name }} {{ teacher.last_name }}</strong>? This
+            action cannot be undone.
+        </p>
+        <form method="POST" action="{% url 'teacher_delete' teacher.id %}"
+            style="display: flex; gap: 1rem; justify-content: center;">
+            {% csrf_token %}
+            <button type="button" onclick="closeModal('deleteModal')" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-danger">Delete Teacher</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

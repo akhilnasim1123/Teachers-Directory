@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TeacherDirectory{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="brand">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                </path>
+            </svg>
+            TeacherDir
+        </div>
+        <ul class="nav-links">
+            <li><a href="{% url 'teachers' %}"
+                    class="{% if request.resolver_match.url_name == 'teachers' %}active{% endif %}">Directory</a></li>
+            <li><a href="{% url 'import_teachers' %}"
+                    class="{% if request.resolver_match.url_name == 'import_teachers' %}active{% endif %}">Import
+                    Teachers</a></li>
+            <li><a href="#" onclick="openModal('logoutModal')" style="color: var(--error-color);">Logout</a></li>
+        </ul>
+        <div class="user-info">
+            <div class="user-avatar">{{ request.user.username|make_list|first|upper }}</div>
+            <div>
+                <div style="font-weight: 500;">{{ request.user.username }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">Administrator</div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert-success">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Logout Modal -->
+    <div id="logoutModal" class="modal-overlay modal-delete">
+        <div class="modal-container">
+            <div
+                style="background: #fee2e2; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #ef4444;">
+                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                    </path>
+                </svg>
+            </div>
+
+            <h3 class="modal-title" style="margin-bottom: 1rem;">Confirm Logout</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                Are you sure you want to log out of the Teacher Directory?
+            </p>
+
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="closeModal('logoutModal')" class="btn btn-secondary">Cancel</button>
+                <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/script.js' %}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}Teachers | TeacherDirectory{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+    }
+
+    .filter-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .subject-select {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        min-width: 200px;
+    }
+
+    .alphabet-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .letter-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border-color);
+        background: white;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        color: var(--text-secondary);
+    }
+
+    .letter-btn:hover,
+    .letter-btn.active {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background-color: #eef2ff;
+    }
+
+    .teachers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .teacher-card {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .teacher-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-color);
+    }
+
+    .teacher-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1rem;
+        border: 4px solid #f3f4f6;
+    }
+
+    .teacher-name {
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin-bottom: 0.25rem;
+        color: var(--text-main);
+    }
+
+    .teacher-email {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .subject-tag {
+        display: inline-block;
+        background: #e5e7eb;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        margin: 2px;
+        color: #4b5563;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Directory</h1>
+    <a href="{% url 'teacher_create' %}" class="btn">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Add Teacher
+    </a>
+</div>
+
+<div class="filter-section">
+    <div class="filter-row">
+        <select id="subject-filter" class="subject-select">
+            <option value="">All Subjects</option>
+            {% for subject in subjects %}
+            <option value="{{ subject.name }}">{{ subject.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="alphabet-grid">
+        <button class="letter-btn" id="clear-filter">ALL</button>
+        {% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+        <button class="letter-btn" data-letter="{{ letter }}">
+            {{ letter }}
+        </button>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="teacher-list" class="teachers-grid">
+    {% include 'partials/teacher_list.html' %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        let currentLetter = '';
+        let currentSubject = '';
+
+        $('#subject-filter').change(function () {
+            currentSubject = $(this).val();
+            fetchTeachers();
+        });
+
+        $('.letter-btn').click(function () {
+            if (this.id === 'clear-filter') {
+                currentLetter = '';
+                $('.letter-btn').removeClass('active');
+            } else {
+                currentLetter = $(this).data('letter');
+                $('.letter-btn').removeClass('active');
+                $(this).addClass('active');
+            }
+            fetchTeachers();
+        });
+
+        function fetchTeachers() {
+            $.get("{% url 'filter' %}", {
+                subject: currentSubject,
+                letter: currentLetter
+            }, function (data) {
+                $('#teacher-list').html(data);
+            });
+        }
+    });
+</script>
+{% endblock %}
