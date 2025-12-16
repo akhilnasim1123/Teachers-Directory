@@ -72,7 +72,3 @@ Navigate to **Import Teachers** in the sidebar. You can upload a CSV file with t
 5.  Phone Number
 6.  Room Number
 7.  Subjects (separated by `,` or `|`)
-
-
-## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
