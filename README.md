@@ -50,7 +50,14 @@ Apply migrations to create the database schema.
 python manage.py migrate
 ```
 
-### 5. Run the Server
+### 5. Create a Superuser
+To access the admin panel and system, create a superuser account.
+```bash
+python manage.py createsuperuser
+```
+Follow the prompts to set a username, email, and password.
+
+### 6. Run the Server
 Start the development server.
 ```bash
 python manage.py runserver
@@ -60,8 +67,7 @@ Visit `http://127.0.0.1:8000/` in your browser.
 ## 🔑 Usage
 
 ### Administrator Access
-*   **Login**: Access the system using your admin credentials.
-    *   *Demo Credentials*: `admin` / `admin` (if using the provided db)
+*   **Login**: Access the system using the superuser credentials you created.
 
 ### Importing Data
 Navigate to **Import Teachers** in the sidebar. You can upload a CSV file with the following column order:
@@ -72,3 +78,4 @@ Navigate to **Import Teachers** in the sidebar. You can upload a CSV file with t
 5.  Phone Number
 6.  Room Number
 7.  Subjects (separated by `,` or `|`)
+
